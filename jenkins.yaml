@@ -1,0 +1,17 @@
+jenkins:
+  systemMessage: "Modular Jenkins for EKS — Platform & Service Pipelines"
+  securityRealm:
+    local:
+      allowsSignup: false
+  authorizationStrategy:
+    projectMatrix:
+      permissions:
+        - "Overall/Administer:platform-team"
+        - "Job/Read:app-teams"
+        - "Job/Build:app-teams"
+        - "Job/Configure:platform-team"
+  jobs:
+    - name: "platform/eks-env-manage"
+    - name: "platform/base-image-build"
+    - name: "services/hello-svc-ci"
+    - name: "services/hello-svc-deploy"
