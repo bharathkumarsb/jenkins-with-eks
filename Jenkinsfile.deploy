@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Init') {
+            steps {
+                initPipeline()
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh '''
+                    helm upgrade --install my-service ./charts/my-service \
+                      --values values-${ENV}.yaml --set image.tag=$BUILD_TAG
+                '''
+            }
+        }
+        stage('Health Check') {
+            steps {
+                sh 'kubectl rollout status deployment/my-service -n default'
+                sh 'curl -f http://my-service.default.svc.cluster.local/healthz'
+            }
+        }
+    }
+    environment {
+        ENV = 'dev'
+        BUILD_TAG = "${env.GIT_COMMIT.take(7)}"
+    }
+}
