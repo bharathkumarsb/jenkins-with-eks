@@ -1,0 +1,13 @@
+replicaCount: 2
+image:
+  repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-service
+  tag: latest
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+service:
+  type: ClusterIP
+  port: 80
+env:
+  ENV: qa
