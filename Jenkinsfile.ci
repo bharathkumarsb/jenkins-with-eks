@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+    stages {
+        stage('Init') {
+            steps {
+                initPipeline()
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'docker build -t $IMAGE_REPO:$BUILD_TAG .'
+            }
+        }
+        stage('Scan') {
+            steps {
+                sh 'trivy image $IMAGE_REPO:$BUILD_TAG'
+            }
+        }
+        stage('Push') {
+            steps {
+                withCredentials([string(credentialsId: 'ecr-creds', variable: 'ECR_CREDS')]) {
+                    sh 'docker push $IMAGE_REPO:$BUILD_TAG'
+                }
+            }
+        }
+    }
+    environment {
+        IMAGE_REPO = '123456789012.dkr.ecr.us-west-2.amazonaws.com/my-service'
+        BUILD_TAG = "${env.GIT_COMMIT.take(7)}"
+    }
+}
